@@ -1,0 +1,65 @@
+name: Gerar APK assinado
+
+on:
+  push:
+    branches: [main]
+    paths: ['app/**', '.github/workflows/apk.yml']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Gerar projeto Android
+        run: |
+          flutter --version
+          flutter create --org br.cesupa --project-name circuito --platforms android .
+          bash tool/patch_android.sh
+
+      - name: Dependências
+        run: flutter pub get
+
+      - name: Compilar APK release
+        run: flutter build apk --release --build-number=${{ github.run_number }}
+
+      - name: Assinar APK com chave de release
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          set -e
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > release.jks
+            PASS="$KEYSTORE_PASSWORD"
+          else
+            echo "::warning::Secrets KEYSTORE_BASE64/KEYSTORE_PASSWORD ausentes; gerando chave temporária."
+            PASS=circuito123
+            keytool -genkeypair -noprompt -keystore release.jks -alias circuito -keyalg RSA -keysize 2048 \
+              -validity 10000 -storepass "$PASS" -keypass "$PASS" -dname "CN=Circuito, O=CESUPA, C=BR"
+          fi
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          mkdir -p ../saida
+          "$BT/apksigner" sign --ks release.jks --ks-pass "pass:$PASS" --ks-key-alias circuito \
+            --out ../saida/circuito-descobertas.apk build/app/outputs/flutter-apk/app-release.apk
+          "$BT/apksigner" verify --print-certs ../saida/circuito-descobertas.apk
+          rm -f release.jks
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: circuito-descobertas-apk
+          path: saida/circuito-descobertas.apk
