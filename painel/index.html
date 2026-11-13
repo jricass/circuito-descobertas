@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Circuito de Descobertas · Painel da organização</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+  <header class="topo">
+    <div>
+      <h1>Circuito de Descobertas</h1>
+      <p>Painel da organização · Amazon Hacking</p>
+    </div>
+    <div id="usuario" class="usuario hidden">
+      <span id="emailAdmin"></span>
+      <button id="btnSair" class="sec">Sair</button>
+    </div>
+  </header>
+
+  <!-- LOGIN -->
+  <section id="telaLogin" class="cartao login hidden">
+    <h2>Entrar como administrador</h2>
+    <form id="formLogin">
+      <label>E-mail <input type="email" id="loginEmail" required autocomplete="username"></label>
+      <label>Senha <input type="password" id="loginSenha" required autocomplete="current-password"></label>
+      <button type="submit">Entrar</button>
+      <p id="loginErro" class="erro"></p>
+    </form>
+  </section>
+
+  <!-- PAINEL -->
+  <main id="telaPainel" class="hidden">
+    <section class="metricas">
+      <div class="metrica"><span id="mEstandes">0</span><small>estandes</small></div>
+      <div class="metrica"><span id="mAtivos">0</span><small>ativos</small></div>
+      <div class="metrica"><span id="mCheckins">0</span><small>check-ins confirmados</small></div>
+      <div class="metrica"><span id="mVisitantes">0</span><small>visitantes únicos</small></div>
+    </section>
+
+    <div class="grade">
+      <section class="cartao">
+        <h2 id="tituloForm">Cadastrar estande</h2>
+        <form id="formEstande">
+          <input type="hidden" id="estId">
+          <label>Nome <input id="estNome" maxlength="80" required></label>
+          <label>Descrição breve <textarea id="estDesc" maxlength="300" rows="3"></textarea></label>
+          <label>Localização <input id="estLocal" maxlength="120" placeholder="Ex.: Corredor B, estande 12"></label>
+          <label class="check"><input type="checkbox" id="estAtivo" checked> Estande ativo</label>
+          <div class="acoes">
+            <button type="submit" id="btnSalvar">Salvar</button>
+            <button type="button" id="btnCancelar" class="sec hidden">Cancelar edição</button>
+          </div>
+          <p id="formMsg" class="msg"></p>
+        </form>
+        <hr>
+        <button id="btnExemplos" class="sec">Criar 3 estandes fictícios de exemplo</button>
+      </section>
+
+      <section class="cartao">
+        <h2>Missão surpresa (Remote Config)</h2>
+        <p>Marque os estandes destacados na coluna ★ da tabela. Depois, no console do Firebase →
+          <b>Remote Config</b>, cole o valor abaixo no parâmetro <code>missao_estandes</code> e
+          publique com <code>missao_ativa = true</code>.</p>
+        <div class="copiar">
+          <code id="valorMissao">(nenhum selecionado)</code>
+          <button id="btnCopiarMissao" class="sec">Copiar</button>
+        </div>
+        <h3>Últimos check-ins</h3>
+        <ul id="ultimos" class="ultimos"><li class="vazio">Nenhum check-in ainda.</li></ul>
+      </section>
+    </div>
+
+    <section class="cartao">
+      <h2>Estandes e check-ins por estande</h2>
+      <div class="tabela-wrap">
+        <table>
+          <thead>
+            <tr><th title="Destacar na missão">★</th><th>Estande</th><th>Localização</th><th>Status</th>
+              <th>Check-ins</th><th>ID</th><th>Ações</th></tr>
+          </thead>
+          <tbody id="tabela"><tr><td colspan="7" class="vazio">Carregando…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL QR -->
+  <div id="modalQr" class="modal hidden">
+    <div class="modal-caixa">
+      <h2 id="qrNome"></h2>
+      <p id="qrLocal"></p>
+      <div id="qrBox" class="qrbox"></div>
+      <p class="mono" id="qrTexto"></p>
+      <div class="acoes nao-imprimir">
+        <button id="btnImprimir">Imprimir</button>
+        <a id="btnAbrirQr" class="botao sec" target="_blank">Abrir em outra aba</a>
+        <button id="btnFecharQr" class="sec">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
