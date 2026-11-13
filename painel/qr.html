@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QR do estande</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; text-align: center; padding: 32px; color: #10261d; }
+    h1 { margin: 0 0 4px; font-size: 32px; }
+    p { margin: 4px 0 24px; color: #456; font-size: 18px; }
+    #qr { display: inline-block; padding: 16px; background: #fff; border: 2px solid #0b7a55; border-radius: 16px; }
+    small { display: block; margin-top: 16px; font-family: monospace; color: #678; }
+    button { margin-top: 24px; padding: 10px 20px; font-size: 16px; border-radius: 8px; border: 0; background: #0b7a55; color: #fff; cursor: pointer; }
+    @media print { button { display: none; } }
+  </style>
+</head>
+<body>
+  <h1 id="nome"></h1>
+  <p id="local"></p>
+  <div id="qr"></div>
+  <small id="txt"></small>
+  <p>Abra o app <b>Circuito de Descobertas</b> e toque em <b>Check-in</b>.</p>
+  <button onclick="window.print()">Imprimir</button>
+  <script>
+    const p = new URLSearchParams(location.search);
+    const id = p.get('id') || '';
+    document.getElementById('nome').textContent = p.get('nome') || 'Estande';
+    document.getElementById('local').textContent = p.get('local') || '';
+    const texto = 'circuito:' + id;
+    document.getElementById('txt').textContent = texto;
+    new QRCode(document.getElementById('qr'), { text: texto, width: 320, height: 320, correctLevel: QRCode.CorrectLevel.M });
+  </script>
+</body>
+</html>
