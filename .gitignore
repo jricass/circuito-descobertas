@@ -1,0 +1,10 @@
+app/build/
+app/.dart_tool/
+app/.flutter-plugins*
+app/pubspec.lock
+app/android/*
+!app/android/app/
+app/android/app/*
+!app/android/app/google-services.json
+*.jks
+*.keystore
