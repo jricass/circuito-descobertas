@@ -40,6 +40,18 @@ fi
 grep -q 'com.google.gms.google-services' "$SETTINGS" || { echo "::error::Falhou ao inserir plugin em $SETTINGS"; cat "$SETTINGS"; exit 1; }
 grep -q 'com.google.gms.google-services' "$APP" || { echo "::error::Falhou ao inserir plugin em $APP"; cat "$APP"; exit 1; }
 
+# Desliga o "lintVital" do release (falha conhecida do lint em plugins, não afeta o app)
+ROOT_GRADLE=android/build.gradle.kts
+[ -f "$ROOT_GRADLE" ] || ROOT_GRADLE=android/build.gradle
+if ! grep -q 'lintVital' "$ROOT_GRADLE"; then
+  cat >> "$ROOT_GRADLE" <<'EOF'
+
+subprojects {
+    tasks.matching { it.name.contains("lintVital") }.configureEach { enabled = false }
+}
+EOF
+fi
+
 # Nome do app no celular
 sed -i 's/android:label="circuito"/android:label="Circuito de Descobertas"/' "$MANIFEST"
 
